@@ -1,0 +1,1 @@
+AppPlan AI er en moderne planleggings- og oppgavehåndteringsapp designet for utviklere. Den kombinerer sprint-planlegging, AI-drevet estimat og oppgavedeling med et raskt, responsivt frontend og et robust backend-API.
