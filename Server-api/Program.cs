@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using MediatR.RequestHandling;
+using Scalar.AspNetCore;
 using Server_api.Data;
 using Server_api.Features.Projects.CreateProject;
 using Server_api.Infrastructure.Endpoints;
@@ -20,6 +21,7 @@ var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
+    app.MapScalarApiReference();
 }
 
 app.UseHttpsRedirection();
