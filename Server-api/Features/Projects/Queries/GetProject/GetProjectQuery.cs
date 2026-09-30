@@ -1,5 +1,3 @@
-using MediatR.RequestHandling;
-
 namespace Server_api.Features.Projects.GetProject;
 
 public sealed record GetProjectQuery(Guid Id) : IQuery<GetProjectResponse>;

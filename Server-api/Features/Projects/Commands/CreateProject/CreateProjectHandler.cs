@@ -1,9 +1,3 @@
-using MediatR;
-using MediatR.RequestHandling;
-using Microsoft.EntityFrameworkCore;
-using Server_api.Data;
-using Server_api.Models;
-
 namespace Server_api.Features.Projects.CreateProject;
 
 public sealed class CreateProjectHandler(AppDbContext dbContext)

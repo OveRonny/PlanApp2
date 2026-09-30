@@ -1,5 +1,3 @@
-using MediatR.RequestHandling;
-
 namespace Server_api.Features.Projects.GetProjects;
 
 public sealed record GetProjectsQuery(Guid? WorkspaceId) : IQuery<IReadOnlyList<ProjectListItem>>;

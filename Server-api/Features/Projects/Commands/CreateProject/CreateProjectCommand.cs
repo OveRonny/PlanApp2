@@ -1,5 +1,3 @@
-using MediatR.RequestHandling;
-
 namespace Server_api.Features.Projects.CreateProject;
 
 public sealed record CreateProjectCommand(

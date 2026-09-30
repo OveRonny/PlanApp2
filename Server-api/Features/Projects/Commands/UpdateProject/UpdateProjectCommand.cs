@@ -1,5 +1,3 @@
-using MediatR.RequestHandling;
-
 namespace Server_api.Features.Projects.UpdateProject;
 
 public sealed record UpdateProjectCommand(

@@ -1,6 +1,3 @@
-using MediatR.RequestHandling;
-using Server_api.Infrastructure.Endpoints;
-
 namespace Server_api.Features.Projects.UpdateProject;
 
 public sealed class UpdateProjectEndpoint : IEndpoint

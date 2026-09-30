@@ -1,8 +1,3 @@
-using MediatR;
-using MediatR.RequestHandling;
-using Microsoft.EntityFrameworkCore;
-using Server_api.Data;
-
 namespace Server_api.Features.Projects.GetProject;
 
 public sealed class GetProjectHandler(AppDbContext dbContext)

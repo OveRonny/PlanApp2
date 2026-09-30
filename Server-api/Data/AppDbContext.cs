@@ -1,6 +1,3 @@
-using Microsoft.EntityFrameworkCore;
-using Server_api.Models;
-
 namespace Server_api.Data;
 
 public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(options)
