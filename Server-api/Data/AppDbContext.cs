@@ -41,15 +41,15 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
 
         modelBuilder.Entity<Sprint>()
             .HasOne(x => x.Project).WithMany(x => x.Sprints)
-            .HasForeignKey(x => x.ProjectId).OnDelete(DeleteBehavior.Cascade);
+            .HasForeignKey(x => x.ProjectId).OnDelete(DeleteBehavior.Restrict);
 
         modelBuilder.Entity<Feature>()
             .HasOne(x => x.Project).WithMany(x => x.Features)
-            .HasForeignKey(x => x.ProjectId).OnDelete(DeleteBehavior.Cascade);
+            .HasForeignKey(x => x.ProjectId).OnDelete(DeleteBehavior.Restrict);
 
         modelBuilder.Entity<WorkItem>()
             .HasOne(x => x.Project).WithMany(x => x.WorkItems)
-            .HasForeignKey(x => x.ProjectId).OnDelete(DeleteBehavior.Cascade);
+            .HasForeignKey(x => x.ProjectId).OnDelete(DeleteBehavior.Restrict);
 
         modelBuilder.Entity<WorkItem>()
             .HasOne(x => x.Feature).WithMany(x => x.WorkItems)
