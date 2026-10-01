@@ -21,6 +21,7 @@ builder.Services.AddCors(options =>
 });
 builder.Services.AddIdentityApiEndpoints<User>()
     .AddEntityFrameworkStores<AppDbContext>();
+builder.Services.AddAuthorization();
 builder.Services.AddMediator<CreateProjectCommand>();
 
 // Add services to the container.
