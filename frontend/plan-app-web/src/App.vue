@@ -10,11 +10,16 @@ const mode = ref<'login' | 'register'>('login')
 const notice = ref<string | null>(null)
 function switchMode(nextMode: 'login' | 'register') { mode.value = nextMode; notice.value = null }
 function handleAuthenticated() { isAuthenticated.value = true }
-</script>
 
+const mode = ref<'login' | 'register'>('login')
+const notice = ref<string | null>(null)
+function switchMode(nextMode: 'login' | 'register') { mode.value = nextMode; notice.value = null }
+function handleAuthenticated() { notice.value = 'Du er logget inn. Workspace kommer i neste steg.' }
+</script>
 <template>
   <WorkspacePage v-if="isAuthenticated" />
   <AuthShell v-else>
+  <AuthShell>
     <template #form>
       <LoginForm v-if="mode === 'login'" @authenticated="handleAuthenticated" @register="switchMode('register')" />
       <RegisterForm v-else @registered="switchMode('login')" @login="switchMode('login')" />
