@@ -5,6 +5,7 @@ import LoginForm from './features/auth/components/LoginForm.vue'
 import RegisterForm from './features/auth/components/RegisterForm.vue'
 import WorkspacePage from './features/workspaces/components/WorkspacePage.vue'
 import ProjectsPage from './features/projects/components/ProjectsPage.vue'
+import { logout } from './features/auth/api/authApi'
 
 const isAuthenticated = ref(Boolean(localStorage.getItem('planapp.accessToken')))
 const mode = ref<'login' | 'register'>('login')
@@ -32,7 +33,7 @@ onBeforeUnmount(() => window.removeEventListener('planapp:session-expired', hand
 
 <template>
   <ProjectsPage v-if="isAuthenticated && selectedWorkspace" :workspace-id="selectedWorkspace.id" :workspace-name="selectedWorkspace.name" @back="selectedWorkspace = null" />
-  <WorkspacePage v-else-if="isAuthenticated" @selected="selectedWorkspace = $event" />
+  <WorkspacePage v-else-if="isAuthenticated" @selected="selectedWorkspace = $event" @logout="logout" />
   <AuthShell v-else>
     <template #form>
       <LoginForm v-if="mode === 'login'" @authenticated="handleAuthenticated" @register="switchMode('register')" />

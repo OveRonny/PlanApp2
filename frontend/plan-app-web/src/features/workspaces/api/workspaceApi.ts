@@ -1,4 +1,4 @@
-const apiBaseUrl = import.meta.env.VITE_API_URL ?? 'http://localhost:5238'
+import { apiFetch, readApiError } from '../../../shared/api/apiClient'
 
 export interface Workspace {
   id: string
@@ -7,60 +7,33 @@ export interface Workspace {
   createdAt: string
 }
 
-function authHeaders(): HeadersInit {
-  const token = localStorage.getItem('planapp.accessToken')
-  return token ? { Authorization: `Bearer ${token}` } : {}
-}
-
-function handleUnauthorized(response: Response) {
-  if (response.status === 401) {
-    localStorage.removeItem('planapp.accessToken')
-    localStorage.removeItem('planapp.refreshToken')
-    window.dispatchEvent(new CustomEvent('planapp:session-expired'))
-  }
-}
-
-async function readError(response: Response) {
-  const body = await response.json().catch(() => ({})) as { title?: string; detail?: string }
-  return body.detail ?? body.title ?? 'Noe gikk galt. Prøv igjen.'
-}
+async function json<T>(response: Response): Promise<T> { if (!response.ok) throw new Error(await readApiError(response)); return response.json() as Promise<T> }
 
 export async function getWorkspaces(): Promise<Workspace[]> {
-  const response = await fetch(`${apiBaseUrl}/api/workspaces`, { headers: authHeaders() })
-  handleUnauthorized(response)
-  if (!response.ok) throw new Error(await readError(response))
-  return response.json() as Promise<Workspace[]>
+  return json<Workspace[]>(await apiFetch('/api/workspaces'))
 }
 
 export async function createWorkspace(name: string): Promise<Workspace> {
-  const response = await fetch(`${apiBaseUrl}/api/workspaces`, {
+  const response = await apiFetch('/api/workspaces', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json', ...authHeaders() },
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ name }),
   })
-  handleUnauthorized(response)
-  if (!response.ok) throw new Error(await readError(response))
-  return response.json() as Promise<Workspace>
+  return json<Workspace>(response)
 }
 
 export async function getWorkspace(id: string): Promise<Workspace> {
-  const response = await fetch(`${apiBaseUrl}/api/workspaces/${id}`, { headers: authHeaders() })
-  handleUnauthorized(response)
-  if (!response.ok) throw new Error(await readError(response))
-  return response.json() as Promise<Workspace>
+  return json<Workspace>(await apiFetch(`/api/workspaces/${id}`))
 }
 
 export async function updateWorkspace(id: string, name: string): Promise<Workspace> {
-  const response = await fetch(`${apiBaseUrl}/api/workspaces/${id}`, {
-    method: 'PUT', headers: { 'Content-Type': 'application/json', ...authHeaders() }, body: JSON.stringify({ name }),
+  const response = await apiFetch(`/api/workspaces/${id}`, {
+    method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name }),
   })
-  handleUnauthorized(response)
-  if (!response.ok) throw new Error(await readError(response))
-  return response.json() as Promise<Workspace>
+  return json<Workspace>(response)
 }
 
 export async function deleteWorkspace(id: string): Promise<void> {
-  const response = await fetch(`${apiBaseUrl}/api/workspaces/${id}`, { method: 'DELETE', headers: authHeaders() })
-  handleUnauthorized(response)
-  if (!response.ok) throw new Error(await readError(response))
+  const response = await apiFetch(`/api/workspaces/${id}`, { method: 'DELETE' })
+  if (!response.ok) throw new Error(await readApiError(response))
 }

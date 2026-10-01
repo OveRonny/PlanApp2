@@ -11,7 +11,7 @@ const error = ref<string | null>(null)
 const editingId = ref<string | null>(null)
 const editingName = ref('')
 const workspaceToDelete = ref<Workspace | null>(null)
-const emit = defineEmits<{ selected: [workspace: Workspace] }>()
+const emit = defineEmits<{ selected: [workspace: Workspace]; logout: [] }>()
 
 async function loadWorkspaces() {
   loading.value = true
@@ -60,7 +60,7 @@ onMounted(loadWorkspaces)
   <main class="workspace-page">
     <header class="workspace-header">
       <div><p class="eyebrow">PLANAPP AI</p><h1>Dine workspaces</h1><p class="muted">Samle prosjektene dine på ett sted.</p></div>
-      <button class="ghost-button" type="button" @click="loadWorkspaces">Oppdater</button>
+      <div class="workspace-header-actions"><button class="ghost-button" type="button" @click="loadWorkspaces">Oppdater</button><button class="ghost-button" type="button" @click="emit('logout')">Logg ut</button></div>
     </header>
     <section class="workspace-create" aria-labelledby="create-workspace-heading">
       <div><h2 id="create-workspace-heading">Nytt workspace</h2><p class="muted">Et workspace kan inneholde flere prosjekter.</p></div>
