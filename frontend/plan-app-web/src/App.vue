@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { onBeforeUnmount, onMounted, ref } from 'vue'
 import AuthShell from './features/auth/components/AuthShell.vue'
 import LoginForm from './features/auth/components/LoginForm.vue'
 import RegisterForm from './features/auth/components/RegisterForm.vue'
@@ -10,6 +10,9 @@ const mode = ref<'login' | 'register'>('login')
 const notice = ref<string | null>(null)
 function switchMode(nextMode: 'login' | 'register') { mode.value = nextMode; notice.value = null }
 function handleAuthenticated() { isAuthenticated.value = true }
+function handleSessionExpired() { isAuthenticated.value = false; mode.value = 'login'; notice.value = 'Innloggingen din har utløpt. Logg inn på nytt.' }
+onMounted(() => window.addEventListener('planapp:session-expired', handleSessionExpired))
+onBeforeUnmount(() => window.removeEventListener('planapp:session-expired', handleSessionExpired))
 </script>
 
 <template>
