@@ -5,5 +5,6 @@ global using Microsoft.AspNetCore.Identity;
 global using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 global using Server_api.Data;
 global using Server_api.Infrastructure.Authentication;
+global using Server_api.Infrastructure.Validation;
 global using Server_api.Infrastructure.Endpoints;
 global using Server_api.Models;

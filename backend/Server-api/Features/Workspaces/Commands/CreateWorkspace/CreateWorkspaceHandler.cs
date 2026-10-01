@@ -9,9 +9,14 @@ public sealed class CreateWorkspaceHandler(
         CreateWorkspaceCommand command,
         CancellationToken cancellationToken)
     {
+        var name = command.Name.Trim();
+        var validationError = ValidationRules.NameError(name, "Workspace");
+        if (validationError is not null)
+            return (Result<CreateWorkspaceResponse>)Result.Fail(validationError);
+
         var workspace = new Workspace
         {
-            Name = command.Name.Trim(),
+            Name = name,
             OwnerId = currentUser.UserId
         };
 

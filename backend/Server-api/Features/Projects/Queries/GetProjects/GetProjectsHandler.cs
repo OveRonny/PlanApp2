@@ -1,6 +1,6 @@
 namespace Server_api.Features.Projects.GetProjects;
 
-public sealed class GetProjectsHandler(AppDbContext dbContext)
+public sealed class GetProjectsHandler(AppDbContext dbContext, ICurrentUser currentUser)
     : IQueryHandler<GetProjectsQuery, IReadOnlyList<ProjectListItem>>
 {
     public async Task<MediatR.Result<IReadOnlyList<ProjectListItem>>> Handle(
@@ -9,7 +9,8 @@ public sealed class GetProjectsHandler(AppDbContext dbContext)
     {
         var projects = await dbContext.Projects
             .AsNoTracking()
-            .Where(x => query.WorkspaceId == null || x.WorkspaceId == query.WorkspaceId)
+            .Where(x => (query.WorkspaceId == null || x.WorkspaceId == query.WorkspaceId) &&
+                (x.Workspace.OwnerId == currentUser.UserId || x.Members.Any(m => m.UserId == currentUser.UserId)))
             .OrderByDescending(x => x.CreatedAt)
             .Select(x => new ProjectListItem(
                 x.Id,

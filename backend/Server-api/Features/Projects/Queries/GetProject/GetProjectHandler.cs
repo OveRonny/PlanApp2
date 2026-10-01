@@ -1,6 +1,6 @@
 namespace Server_api.Features.Projects.GetProject;
 
-public sealed class GetProjectHandler(AppDbContext dbContext)
+public sealed class GetProjectHandler(AppDbContext dbContext, ICurrentUser currentUser)
     : IQueryHandler<GetProjectQuery, GetProjectResponse>
 {
     public async Task<Result<GetProjectResponse>> Handle(
@@ -9,7 +9,8 @@ public sealed class GetProjectHandler(AppDbContext dbContext)
     {
         var project = await dbContext.Projects
             .AsNoTracking()
-            .Where(x => x.Id == query.Id)
+            .Where(x => x.Id == query.Id &&
+                (x.Workspace.OwnerId == currentUser.UserId || x.Members.Any(m => m.UserId == currentUser.UserId)))
             .Select(x => new GetProjectResponse(
                 x.Id,
                 x.WorkspaceId,
