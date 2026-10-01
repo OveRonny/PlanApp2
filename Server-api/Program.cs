@@ -28,7 +28,9 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-app.MapGroup("/api/auth").MapIdentityApi<User>();
+app.MapGroup("/api/auth")
+    .WithTags("Authentication")
+    .MapIdentityApi<User>();
 app.MapEndpoints();
 
 app.Run();

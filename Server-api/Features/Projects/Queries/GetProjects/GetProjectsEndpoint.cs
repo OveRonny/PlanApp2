@@ -14,6 +14,6 @@ public sealed class GetProjectsEndpoint : IEndpoint
                 cancellationToken);
 
             return Results.Ok(result.Value);
-        });
+        }).WithTags("Projects");
     }
 }

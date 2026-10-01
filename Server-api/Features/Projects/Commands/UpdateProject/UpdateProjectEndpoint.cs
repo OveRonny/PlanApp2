@@ -24,7 +24,7 @@ public sealed class UpdateProjectEndpoint : IEndpoint
 
             var project = result.Value!;
             return Results.Ok(project);
-        });
+        }).WithTags("Projects");
     }
 }
 
