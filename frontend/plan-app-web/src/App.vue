@@ -6,11 +6,13 @@ import RegisterForm from './features/auth/components/RegisterForm.vue'
 import WorkspacePage from './features/workspaces/components/WorkspacePage.vue'
 import ProjectsPage from './features/projects/components/ProjectsPage.vue'
 import { logout } from './features/auth/api/authApi'
+import GitHubMembersPage from './features/github/components/GitHubMembersPage.vue'
 
 const isAuthenticated = ref(Boolean(localStorage.getItem('planapp.accessToken')))
 const mode = ref<'login' | 'register'>('login')
 const notice = ref<string | null>(null)
 const selectedWorkspace = ref<{ id: string; name: string } | null>(null)
+const githubWorkspace = ref<{ id: string; name: string } | null>(null)
 
 function switchMode(nextMode: 'login' | 'register') {
   mode.value = nextMode
@@ -32,8 +34,9 @@ onBeforeUnmount(() => window.removeEventListener('planapp:session-expired', hand
 </script>
 
 <template>
-  <ProjectsPage v-if="isAuthenticated && selectedWorkspace" :workspace-id="selectedWorkspace.id" :workspace-name="selectedWorkspace.name" @back="selectedWorkspace = null" />
-  <WorkspacePage v-else-if="isAuthenticated" @selected="selectedWorkspace = $event" @logout="logout" />
+  <GitHubMembersPage v-if="isAuthenticated && githubWorkspace" :workspace-name="githubWorkspace.name" @back="githubWorkspace = null" @connected="githubWorkspace = null" />
+  <ProjectsPage v-else-if="isAuthenticated && selectedWorkspace" :workspace-id="selectedWorkspace.id" :workspace-name="selectedWorkspace.name" @back="selectedWorkspace = null" />
+  <WorkspacePage v-else-if="isAuthenticated" @selected="selectedWorkspace = $event" @github="githubWorkspace = $event" @logout="logout" />
   <AuthShell v-else>
     <template #form>
       <LoginForm v-if="mode === 'login'" @authenticated="handleAuthenticated" @register="switchMode('register')" />
