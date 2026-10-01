@@ -1,6 +1,6 @@
 namespace Server_api.Features.Projects.DeleteProject;
 
-public sealed class DeleteProjectHandler(AppDbContext dbContext)
+public sealed class DeleteProjectHandler(AppDbContext dbContext, ICurrentUser currentUser)
     : ICommandHandler<DeleteProjectCommand, DeleteProjectResponse>
 {
     public async Task<Result<DeleteProjectResponse>> Handle(
@@ -8,7 +8,8 @@ public sealed class DeleteProjectHandler(AppDbContext dbContext)
         CancellationToken cancellationToken)
     {
         var project = await dbContext.Projects
-            .SingleOrDefaultAsync(x => x.Id == command.Id, cancellationToken);
+            .SingleOrDefaultAsync(x => x.Id == command.Id &&
+                (x.Workspace.OwnerId == currentUser.UserId || x.Members.Any(m => m.UserId == currentUser.UserId)), cancellationToken);
 
         if (project is null)
         {

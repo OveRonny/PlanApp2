@@ -17,6 +17,6 @@ public sealed class GetProjectEndpoint : IEndpoint
             }
 
             return Results.Ok(result.Value!);
-        }).WithTags("Projects");
+        }).RequireAuthorization().WithTags("Projects");
     }
 }

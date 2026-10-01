@@ -23,7 +23,7 @@ public sealed class CreateProjectEndpoint : IEndpoint
 
             var project = result.Value!;
             return Results.Created($"/api/projects/{project.Id}", project);
-        }).WithTags("Projects");
+        }).RequireAuthorization().WithTags("Projects");
 
     }
 }

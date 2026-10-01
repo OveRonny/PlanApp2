@@ -1,12 +1,17 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
-import { createWorkspace, getWorkspaces, type Workspace } from '../api/workspaceApi'
+import { createWorkspace, deleteWorkspace, getWorkspaces, updateWorkspace, type Workspace } from '../api/workspaceApi'
+import ConfirmDialog from '../../../shared/components/ConfirmDialog.vue'
 
 const workspaces = ref<Workspace[]>([])
 const name = ref('')
 const loading = ref(true)
 const saving = ref(false)
 const error = ref<string | null>(null)
+const editingId = ref<string | null>(null)
+const editingName = ref('')
+const workspaceToDelete = ref<Workspace | null>(null)
+const emit = defineEmits<{ selected: [workspace: Workspace]; logout: [] }>()
 
 async function loadWorkspaces() {
   loading.value = true
@@ -21,6 +26,33 @@ async function submit() {
   try { workspaces.value = [await createWorkspace(name.value.trim()), ...workspaces.value]; name.value = '' } catch (exception) { error.value = exception instanceof Error ? exception.message : 'Kunne ikke opprette workspace.' } finally { saving.value = false }
 }
 
+function startEditing(workspace: Workspace) {
+  editingId.value = workspace.id
+  editingName.value = workspace.name
+  error.value = null
+}
+
+function cancelEditing() {
+  editingId.value = null
+  editingName.value = ''
+}
+
+async function saveEdit() {
+  if (!editingId.value || !editingName.value.trim()) return
+  saving.value = true
+  error.value = null
+  try {
+    const updated = await updateWorkspace(editingId.value, editingName.value.trim())
+    workspaces.value = workspaces.value.map(workspace => workspace.id === updated.id ? updated : workspace)
+    cancelEditing()
+  } catch (exception) { error.value = exception instanceof Error ? exception.message : 'Kunne ikke oppdatere workspace.' } finally { saving.value = false }
+}
+
+async function removeWorkspace(workspace: Workspace) {
+  error.value = null
+  try { await deleteWorkspace(workspace.id); workspaces.value = workspaces.value.filter(item => item.id !== workspace.id); workspaceToDelete.value = null } catch (exception) { error.value = exception instanceof Error ? exception.message : 'Kunne ikke slette workspace.' }
+}
+
 onMounted(loadWorkspaces)
 </script>
 
@@ -28,7 +60,7 @@ onMounted(loadWorkspaces)
   <main class="workspace-page">
     <header class="workspace-header">
       <div><p class="eyebrow">PLANAPP AI</p><h1>Dine workspaces</h1><p class="muted">Samle prosjektene dine på ett sted.</p></div>
-      <button class="ghost-button" type="button" @click="loadWorkspaces">Oppdater</button>
+      <div class="workspace-header-actions"><button class="ghost-button" type="button" @click="loadWorkspaces">Oppdater</button><button class="ghost-button" type="button" @click="emit('logout')">Logg ut</button></div>
     </header>
     <section class="workspace-create" aria-labelledby="create-workspace-heading">
       <div><h2 id="create-workspace-heading">Nytt workspace</h2><p class="muted">Et workspace kan inneholde flere prosjekter.</p></div>
@@ -37,9 +69,10 @@ onMounted(loadWorkspaces)
     <p v-if="error" class="workspace-error" role="alert">{{ error }}</p>
     <section aria-live="polite">
       <p v-if="loading" class="muted">Laster workspaces…</p>
-      <div v-else-if="workspaces.length" class="workspace-grid"><article v-for="workspace in workspaces" :key="workspace.id" class="workspace-card"><span class="workspace-icon">W</span><div><h3>{{ workspace.name }}</h3><p class="muted">Opprettet {{ new Date(workspace.createdAt).toLocaleDateString('nb-NO') }}</p></div><span class="workspace-arrow">→</span></article></div>
+      <div v-else-if="workspaces.length" class="workspace-grid"><article v-for="workspace in workspaces" :key="workspace.id" class="workspace-card" @click="emit('selected', workspace)"><span class="workspace-icon">W</span><div v-if="editingId !== workspace.id" class="workspace-info"><h3>{{ workspace.name }}</h3><p class="muted">Opprettet {{ new Date(workspace.createdAt).toLocaleDateString('nb-NO') }}</p></div><form v-else class="edit-form" @submit.prevent.stop="saveEdit"><label class="sr-only" :for="`edit-${workspace.id}`">Workspace-navn</label><input :id="`edit-${workspace.id}`" v-model="editingName" maxlength="150" required /><div class="edit-actions"><button class="small-button save" type="submit" :disabled="saving">Lagre</button><button class="small-button" type="button" @click.stop="cancelEditing">Avbryt</button></div></form><div v-if="editingId !== workspace.id" class="workspace-actions" @click.stop><button class="icon-button" type="button" :aria-label="`Rediger ${workspace.name}`" @click="startEditing(workspace)">Rediger</button><button class="icon-button danger" type="button" :aria-label="`Slett ${workspace.name}`" @click="workspaceToDelete = workspace">Slett</button></div></article></div>
       <div v-else class="empty-state"><h2>Ingen workspaces ennå</h2><p class="muted">Opprett ditt første workspace for å komme i gang.</p></div>
     </section>
+    <ConfirmDialog v-if="workspaceToDelete" :open="true" title="Slett workspace" :message="`Er du sikker på at du vil slette «${workspaceToDelete.name}»? Dette kan ikke angres.`" @cancel="workspaceToDelete = null" @confirm="removeWorkspace(workspaceToDelete)" />
   </main>
 </template>
 
@@ -51,5 +84,6 @@ h1, h2, h3, p { margin-top: 0; } h1 { margin-bottom: 10px; font: 600 clamp(2rem,
 .muted { color: #9da9c3; } .ghost-button { padding: 10px 15px; border: 1px solid #34415f; border-radius: 9px; color: #dce3f2; background: transparent; } .workspace-create { max-width: 1100px; display: flex; align-items: center; justify-content: space-between; gap: 24px; margin: 0 auto 34px; padding: 24px; border: 1px solid #25304a; border-radius: 18px; background: #121a30; }
 .create-form { display: flex; gap: 10px; } input { min-width: 250px; padding: 12px 13px; border: 1px solid #34415f; border-radius: 9px; outline: none; color: #f5f7fb; background: #10182d; } input:focus { border-color: #b7f36b; } .primary-button { padding: 12px 18px; border: 0; border-radius: 9px; color: #0b1020; background: #b7f36b; font-weight: 700; } .primary-button:disabled { opacity: .6; }
 .workspace-grid { max-width: 1100px; display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 16px; margin: auto; } .workspace-card { display: flex; align-items: center; gap: 14px; padding: 20px; border: 1px solid #25304a; border-radius: 16px; background: #121a30; } .workspace-card h3 { overflow: hidden; max-width: 190px; text-overflow: ellipsis; white-space: nowrap; } .workspace-icon { display: grid; flex: 0 0 42px; place-items: center; width: 42px; height: 42px; border-radius: 12px; color: #0b1020; background: #b7f36b; font-weight: 800; } .workspace-arrow { margin-left: auto; color: #b7f36b; font-size: 1.4rem; } .workspace-error { max-width: 1100px; margin: 0 auto 20px; color: #ffb8c2; } .empty-state { max-width: 1100px; margin: auto; padding: 60px 20px; border: 1px dashed #34415f; border-radius: 16px; text-align: center; } .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+.workspace-info { min-width: 0; flex: 1; } .workspace-actions { display: flex; gap: 8px; margin-left: auto; } .icon-button, .small-button { padding: 6px 8px; border: 1px solid #34415f; border-radius: 7px; color: #dce3f2; background: transparent; font-size: .78rem; } .icon-button:hover { border-color: #b7f36b; } .icon-button.danger:hover { border-color: #ff8e9d; color: #ffb8c2; } .edit-form { display: flex; flex: 1; flex-wrap: wrap; gap: 8px; } .edit-form input { min-width: 0; flex: 1; } .edit-actions { display: flex; gap: 6px; } .small-button.save { border-color: #b7f36b; color: #b7f36b; }
 @media (max-width: 700px) { .workspace-header, .workspace-create { align-items: stretch; flex-direction: column; } .create-form { flex-direction: column; } input { min-width: 0; width: 100%; } }
 </style>

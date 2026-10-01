@@ -19,6 +19,6 @@ public sealed class DeleteProjectEndpoint : IEndpoint
             }
 
             return Results.NoContent();
-        }).WithTags("Projects");
+        }).RequireAuthorization().WithTags("Projects");
     }
 }
