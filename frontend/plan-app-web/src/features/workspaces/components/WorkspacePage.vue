@@ -11,6 +11,7 @@ const error = ref<string | null>(null)
 const editingId = ref<string | null>(null)
 const editingName = ref('')
 const workspaceToDelete = ref<Workspace | null>(null)
+const emit = defineEmits<{ selected: [workspace: Workspace] }>()
 
 async function loadWorkspaces() {
   loading.value = true
@@ -68,7 +69,7 @@ onMounted(loadWorkspaces)
     <p v-if="error" class="workspace-error" role="alert">{{ error }}</p>
     <section aria-live="polite">
       <p v-if="loading" class="muted">Laster workspaces…</p>
-      <div v-else-if="workspaces.length" class="workspace-grid"><article v-for="workspace in workspaces" :key="workspace.id" class="workspace-card"><span class="workspace-icon">W</span><div v-if="editingId !== workspace.id" class="workspace-info"><h3>{{ workspace.name }}</h3><p class="muted">Opprettet {{ new Date(workspace.createdAt).toLocaleDateString('nb-NO') }}</p></div><form v-else class="edit-form" @submit.prevent="saveEdit"><label class="sr-only" :for="`edit-${workspace.id}`">Workspace-navn</label><input :id="`edit-${workspace.id}`" v-model="editingName" maxlength="150" required /><div class="edit-actions"><button class="small-button save" type="submit" :disabled="saving">Lagre</button><button class="small-button" type="button" @click="cancelEditing">Avbryt</button></div></form><div v-if="editingId !== workspace.id" class="workspace-actions"><button class="icon-button" type="button" :aria-label="`Rediger ${workspace.name}`" @click="startEditing(workspace)">Rediger</button><button class="icon-button danger" type="button" :aria-label="`Slett ${workspace.name}`" @click="workspaceToDelete = workspace">Slett</button></div></article></div>
+      <div v-else-if="workspaces.length" class="workspace-grid"><article v-for="workspace in workspaces" :key="workspace.id" class="workspace-card" @click="emit('selected', workspace)"><span class="workspace-icon">W</span><div v-if="editingId !== workspace.id" class="workspace-info"><h3>{{ workspace.name }}</h3><p class="muted">Opprettet {{ new Date(workspace.createdAt).toLocaleDateString('nb-NO') }}</p></div><form v-else class="edit-form" @submit.prevent.stop="saveEdit"><label class="sr-only" :for="`edit-${workspace.id}`">Workspace-navn</label><input :id="`edit-${workspace.id}`" v-model="editingName" maxlength="150" required /><div class="edit-actions"><button class="small-button save" type="submit" :disabled="saving">Lagre</button><button class="small-button" type="button" @click.stop="cancelEditing">Avbryt</button></div></form><div v-if="editingId !== workspace.id" class="workspace-actions" @click.stop><button class="icon-button" type="button" :aria-label="`Rediger ${workspace.name}`" @click="startEditing(workspace)">Rediger</button><button class="icon-button danger" type="button" :aria-label="`Slett ${workspace.name}`" @click="workspaceToDelete = workspace">Slett</button></div></article></div>
       <div v-else class="empty-state"><h2>Ingen workspaces ennå</h2><p class="muted">Opprett ditt første workspace for å komme i gang.</p></div>
     </section>
     <ConfirmDialog v-if="workspaceToDelete" :open="true" title="Slett workspace" :message="`Er du sikker på at du vil slette «${workspaceToDelete.name}»? Dette kan ikke angres.`" @cancel="workspaceToDelete = null" @confirm="removeWorkspace(workspaceToDelete)" />
