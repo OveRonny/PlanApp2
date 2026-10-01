@@ -1,0 +1,4 @@
+using Microsoft.EntityFrameworkCore;
+namespace Server_api.Features.GitHub.Queries.GetCollaborators;
+public sealed class GetCollaboratorsEndpoint : IEndpoint
+{ public void MapEndpoint(IEndpointRouteBuilder endpoints) { endpoints.MapGet("/api/github/repositories/{repositoryId:long}/collaborators", async (long repositoryId, string fullName, AppDbContext db, ICurrentUser currentUser, IGitHubClient gitHub, IDataProtector protector, CancellationToken cancellationToken) => { var connection = await db.GitHubConnections.AsNoTracking().SingleOrDefaultAsync(x => x.UserId == currentUser.UserId, cancellationToken); if (connection?.AccessTokenProtected is null) return Results.Problem("GitHub er ikke koblet til.", statusCode: StatusCodes.Status409Conflict); return Results.Ok(await gitHub.GetCollaboratorsAsync(protector.Unprotect(connection.AccessTokenProtected), fullName, cancellationToken)); }).RequireAuthorization().WithTags("GitHub"); } }
