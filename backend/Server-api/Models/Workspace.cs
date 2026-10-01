@@ -9,4 +9,6 @@ public class Workspace
 
     public User Owner { get; set; } = null!;
     public ICollection<Project> Projects { get; set; } = [];
+    public ICollection<WorkspaceMember> Members { get; set; } = [];
+    public ICollection<WorkspaceRepository> Repositories { get; set; } = [];
 }

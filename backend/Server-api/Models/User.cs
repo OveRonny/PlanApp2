@@ -12,4 +12,5 @@ public class User : IdentityUser<Guid>
     public ICollection<WorkItem> AssignedWorkItems { get; set; } = [];
     public ICollection<AiPlanSuggestion> AiPlanSuggestions { get; set; } = [];
     public ICollection<ActivityLog> ActivityLogs { get; set; } = [];
+    public ICollection<GitHubConnection> GitHubConnections { get; set; } = [];
 }
