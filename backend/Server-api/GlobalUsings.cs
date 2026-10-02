@@ -4,6 +4,7 @@ global using Microsoft.EntityFrameworkCore;
 global using Microsoft.AspNetCore.Identity;
 global using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 global using Microsoft.AspNetCore.DataProtection;
+global using System.Text.Json.Serialization;
 global using Server_api.Data;
 global using Server_api.Infrastructure.Authentication;
 global using Server_api.Infrastructure.Validation;

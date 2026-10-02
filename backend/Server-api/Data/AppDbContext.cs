@@ -24,12 +24,34 @@ public class AppDbContext(DbContextOptions<AppDbContext> options)
     public DbSet<GitHubUser> GitHubUsers => Set<GitHubUser>();
     public DbSet<WorkspaceMember> WorkspaceMembers => Set<WorkspaceMember>();
     public DbSet<ProjectRepository> ProjectRepositories => Set<ProjectRepository>();
+    public DbSet<Technology> Technologies => Set<Technology>();
+    public DbSet<ProjectTechnology> ProjectTechnologies => Set<ProjectTechnology>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
 
         modelBuilder.Entity<User>().HasIndex(x => x.Email).IsUnique();
+        modelBuilder.Entity<Technology>().HasIndex(x => new { x.Name, x.Category }).IsUnique();
+        modelBuilder.Entity<ProjectTechnology>().HasKey(x => new { x.ProjectId, x.TechnologyId });
+        modelBuilder.Entity<ProjectTechnology>().HasOne(x => x.Project).WithMany(x => x.Technologies).HasForeignKey(x => x.ProjectId).OnDelete(DeleteBehavior.Cascade);
+        modelBuilder.Entity<ProjectTechnology>().HasOne(x => x.Technology).WithMany(x => x.Projects).HasForeignKey(x => x.TechnologyId).OnDelete(DeleteBehavior.Restrict);
+        modelBuilder.Entity<Technology>().Property(x => x.Name).HasMaxLength(100);
+        modelBuilder.Entity<Technology>().HasData(
+            new { Id = Guid.Parse("10000000-0000-0000-0000-000000000001"), Name = "Vue", Category = TechnologyCategory.Frontend, IsActive = true },
+            new { Id = Guid.Parse("10000000-0000-0000-0000-000000000002"), Name = "React", Category = TechnologyCategory.Frontend, IsActive = true },
+            new { Id = Guid.Parse("10000000-0000-0000-0000-000000000003"), Name = "TypeScript", Category = TechnologyCategory.Frontend, IsActive = true },
+            new { Id = Guid.Parse("10000000-0000-0000-0000-000000000004"), Name = "ASP.NET Core", Category = TechnologyCategory.Backend, IsActive = true },
+            new { Id = Guid.Parse("10000000-0000-0000-0000-000000000005"), Name = "Node.js", Category = TechnologyCategory.Backend, IsActive = true },
+            new { Id = Guid.Parse("10000000-0000-0000-0000-000000000006"), Name = "SQL Server", Category = TechnologyCategory.Database, IsActive = true },
+            new { Id = Guid.Parse("10000000-0000-0000-0000-000000000007"), Name = "PostgreSQL", Category = TechnologyCategory.Database, IsActive = true },
+            new { Id = Guid.Parse("10000000-0000-0000-0000-000000000008"), Name = "Docker", Category = TechnologyCategory.Infrastructure, IsActive = true },
+            new { Id = Guid.Parse("10000000-0000-0000-0000-000000000009"), Name = "GitHub Actions", Category = TechnologyCategory.Infrastructure, IsActive = true },
+            new { Id = Guid.Parse("10000000-0000-0000-0000-000000000010"), Name = "xUnit", Category = TechnologyCategory.Testing, IsActive = true },
+            new { Id = Guid.Parse("10000000-0000-0000-0000-000000000011"), Name = "Vitest", Category = TechnologyCategory.Testing, IsActive = true },
+            new { Id = Guid.Parse("10000000-0000-0000-0000-000000000012"), Name = "REST", Category = TechnologyCategory.Integration, IsActive = true },
+            new { Id = Guid.Parse("10000000-0000-0000-0000-000000000013"), Name = "GraphQL", Category = TechnologyCategory.Integration, IsActive = true },
+            new { Id = Guid.Parse("10000000-0000-0000-0000-000000000014"), Name = "Git", Category = TechnologyCategory.Tooling, IsActive = true });
 
         modelBuilder.Entity<GitHubConnection>().HasIndex(x => new { x.UserId, x.GitHubUserId }).IsUnique();
         modelBuilder.Entity<GitHubUser>().HasIndex(x => x.GitHubId).IsUnique();
