@@ -8,6 +8,7 @@ import ProjectsPage from './features/projects/components/ProjectsPage.vue'
 import { logout } from './features/auth/api/authApi'
 import GitHubMembersPage from './features/github/components/GitHubMembersPage.vue'
 import { clearGitHubCallback, connectGitHub } from './features/github/api/githubApi'
+import ProjectTechnologiesPage from './features/technologies/components/ProjectTechnologiesPage.vue'
 
 const isAuthenticated = ref(Boolean(localStorage.getItem('planapp.accessToken')))
 const mode = ref<'login' | 'register'>('login')
@@ -15,6 +16,7 @@ const notice = ref<string | null>(null)
 const selectedWorkspace = ref<{ id: string; name: string } | null>(null)
 const githubProject = ref<{ id: string; name: string } | null>(null)
 const githubConnected = ref(localStorage.getItem('planapp.githubConnected') === 'true')
+const technologyProject = ref<{ id: string; name: string } | null>(null)
 
 async function handleGitHubCallback() {
   const params = new URLSearchParams(window.location.search)
@@ -65,8 +67,9 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <GitHubMembersPage v-if="isAuthenticated && githubProject" :project-id="githubProject.id" :project-name="githubProject.name" :connected="githubConnected" @back="githubProject = null" @connected="githubProject = null" />
-  <ProjectsPage v-else-if="isAuthenticated && selectedWorkspace" :workspace-id="selectedWorkspace.id" :workspace-name="selectedWorkspace.name" @back="selectedWorkspace = null" @github="githubProject = $event" />
+  <ProjectTechnologiesPage v-if="isAuthenticated && technologyProject" :project-id="technologyProject.id" :project-name="technologyProject.name" @back="technologyProject = null" />
+  <GitHubMembersPage v-else-if="isAuthenticated && githubProject" :project-id="githubProject.id" :project-name="githubProject.name" :connected="githubConnected" @back="githubProject = null" @connected="githubProject = null" />
+  <ProjectsPage v-else-if="isAuthenticated && selectedWorkspace" :workspace-id="selectedWorkspace.id" :workspace-name="selectedWorkspace.name" @back="selectedWorkspace = null" @github="githubProject = $event" @technologies="technologyProject = $event" />
   <WorkspacePage v-else-if="isAuthenticated" @selected="selectedWorkspace = $event" @logout="logout" />
   <AuthShell v-else>
     <template #form>

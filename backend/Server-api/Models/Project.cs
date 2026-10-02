@@ -17,4 +17,5 @@ public class Project
     public ICollection<ActivityLog> ActivityLogs { get; set; } = [];
     public ICollection<ProjectSummary> Summaries { get; set; } = [];
     public ProjectRepository? GitHubRepository { get; set; }
+    public ICollection<ProjectTechnology> Technologies { get; set; } = [];
 }
