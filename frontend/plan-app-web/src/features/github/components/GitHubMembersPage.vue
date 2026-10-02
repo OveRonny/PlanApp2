@@ -29,8 +29,8 @@ function saveMembers() { emit('connected') }
     <section class="github-grid">
       <article class="github-panel">
         <span class="github-mark">⌘</span><div><h2>GitHub-konto</h2><p class="muted">Koble til GitHub for å hente repositories og collaborators.</p></div>
-        <button v-if="!connected" class="primary-button github-button" type="button" @click="connectGitHub">Koble til GitHub</button>
-        <p v-else class="connected-status">✓ GitHub er koblet til</p>
+        <button class="primary-button github-button" type="button" @click="connectGitHub">{{ connected ? 'Koble til GitHub på nytt' : 'Koble til GitHub' }}</button>
+        <p v-if="connected" class="connected-status">✓ GitHub er koblet til</p>
       </article>
       <article class="github-panel">
         <div><p class="eyebrow">REPOSITORY</p><h2>Velg repository</h2><p class="muted">Repositoryet blir kilden for workspace-medlemmer.</p></div>

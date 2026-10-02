@@ -46,9 +46,22 @@ function handleSessionExpired() {
   notice.value = 'Innloggingen din har utløpt. Logg inn på nytt.'
 }
 
+function handleLoggedOut() {
+  isAuthenticated.value = false
+  selectedWorkspace.value = null
+  githubWorkspace.value = null
+  githubConnected.value = false
+  localStorage.removeItem('planapp.githubConnected')
+  mode.value = 'login'
+}
+
 onMounted(() => window.addEventListener('planapp:session-expired', handleSessionExpired))
+onMounted(() => window.addEventListener('planapp:logged-out', handleLoggedOut))
 onMounted(handleGitHubCallback)
-onBeforeUnmount(() => window.removeEventListener('planapp:session-expired', handleSessionExpired))
+onBeforeUnmount(() => {
+  window.removeEventListener('planapp:session-expired', handleSessionExpired)
+  window.removeEventListener('planapp:logged-out', handleLoggedOut)
+})
 </script>
 
 <template>
