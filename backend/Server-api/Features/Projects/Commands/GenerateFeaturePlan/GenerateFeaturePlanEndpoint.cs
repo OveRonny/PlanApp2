@@ -10,7 +10,7 @@ public sealed class GenerateFeaturePlanEndpoint : IEndpoint
             var project = await db.Projects.Include(x => x.Workspace).Include(x => x.Technologies).ThenInclude(x => x.Technology).SingleOrDefaultAsync(x => x.Id == projectId, cancellationToken);
             if (project is null) return Results.NotFound(); if (project.Workspace.OwnerId != currentUser.UserId) return Results.Forbid();
             var technologies = project.Technologies.Select(x => x.Technology.Name).ToList();
-            var plan = await planner.GenerateFeaturePlanAsync(project.Name, $"{project.Description}\nAI-kontekst: {project.AiContext}", technologies, $"Område: {request.Category}. Teknologi: {request.TechnologyId}. {request.Request}", cancellationToken);
+            var plan = await planner.GenerateFeaturePlanAsync(project.Name, $"{project.Description}\nAI-kontekst: {project.AiContext}", technologies, $"VIKTIG AVGRENSNING: Denne featuren skal kun implementeres i området {request.Category}. Ikke foreslå backend-, frontend-, database-, DevOps-, test- eller integrasjonsoppgaver fra andre områder. Alle tasks må være direkte relevante for {request.Category}. Valgt teknologi: {request.TechnologyId}. Brukerens behov: {request.Request}", cancellationToken);
             var suggestion = new AiPlanSuggestion { ProjectId = projectId, CreatedById = currentUser.UserId, Prompt = request.Request, ProposedPlan = plan, Provider = "OpenAI", Model = "gpt-4o-mini" };
             db.AiPlanSuggestions.Add(suggestion); await db.SaveChangesAsync(cancellationToken);
             try

@@ -10,7 +10,15 @@ import {
 } from "../api/projectApi";
 
 const props = defineProps<{ workspaceId: string; workspaceName: string }>();
-const emit = defineEmits<{ back: []; github: [project: Project]; technologies: [project: Project]; features: [project: Project]; overview: [project: Project]; tasks: [project: Project] }>();
+const emit = defineEmits<{
+  back: [];
+  github: [project: Project];
+  technologies: [project: Project];
+  features: [project: Project];
+  overview: [project: Project];
+  tasks: [project: Project];
+  kanban: [project: Project];
+}>();
 const projects = ref<Project[]>([]);
 const name = ref("");
 const description = ref("");
@@ -143,10 +151,43 @@ onMounted(load);
           >
             Slett
           </button>
-          <button class="icon-button" type="button" @click.stop="emit('github', project)">GitHub</button>
-          <button class="icon-button" type="button" @click.stop="emit('technologies', project)">Teknologier</button>
-<button class="icon-button" type="button" @click.stop="emit('features', project)">Features</button><button class="icon-button" type="button" @click.stop="emit('tasks', project)">Oppgaver</button>
-          <button class="icon-button" type="button" @click.stop="emit('overview', project)">Oversikt</button>
+          <button
+            class="icon-button"
+            type="button"
+            @click.stop="emit('github', project)"
+          >
+            GitHub
+          </button>
+          <button
+            class="icon-button"
+            type="button"
+            @click.stop="emit('technologies', project)"
+          >
+            Teknologier
+          </button>
+          <button
+            class="icon-button"
+            type="button"
+            @click.stop="emit('features', project)"
+          >
+            Features</button
+          ><button
+            class="icon-button"
+            type="button"
+            @click.stop="emit('tasks', project)"
+          >
+            Oppgaver
+          </button>
+          <button class="icon-button" type="button" @click.stop="emit('kanban', project)">
+            Kanban
+          </button>
+          <button
+            class="icon-button"
+            type="button"
+            @click.stop="emit('overview', project)"
+          >
+            Oversikt
+          </button>
         </div>
       </article>
     </div>
@@ -311,10 +352,11 @@ textarea {
   gap: 16px;
 }
 .workspace-card {
-  display: flex;
-  align-items: flex-start;
-  gap: 15px;
-  min-height: 132px;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: start;
+  gap: 14px 15px;
+  min-height: 150px;
   padding: 21px;
   border: 1px solid #25304a;
   border-radius: 16px;
@@ -357,17 +399,22 @@ textarea {
   font-weight: 800;
 }
 .workspace-actions {
+  grid-column: 1 / -1;
   display: flex;
-  gap: 6px;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding-top: 4px;
+  border-top: 1px solid #25304a;
 }
 .icon-button,
 .small-button {
-  padding: 6px 8px;
+  padding: 8px 11px;
   border: 1px solid #34415f;
   border-radius: 7px;
   color: #dce3f2;
   background: transparent;
-  font-size: 0.76rem;
+  font-size: 0.78rem;
+  cursor: pointer;
 }
 .icon-button:hover {
   border-color: #b7f36b;
