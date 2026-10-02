@@ -4,6 +4,7 @@ public class AiPlanSuggestion
 {
     public Guid Id { get; set; } = Guid.NewGuid();
     public Guid ProjectId { get; set; }
+    public Guid? FeatureId { get; set; }
     public Guid? CreatedById { get; set; }
     public required string Prompt { get; set; }
     public required string ProposedPlan { get; set; }
@@ -13,5 +14,6 @@ public class AiPlanSuggestion
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public DateTime? AppliedAt { get; set; }
     public Project Project { get; set; } = null!;
+    public Feature? Feature { get; set; }
     public User? CreatedBy { get; set; }
 }

@@ -129,6 +129,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options)
             .HasForeignKey(x => x.ParentId).OnDelete(DeleteBehavior.Restrict);
 
         modelBuilder.Entity<AiPlanSuggestion>().HasOne(x => x.Project).WithMany(x => x.AiPlanSuggestions).HasForeignKey(x => x.ProjectId).OnDelete(DeleteBehavior.Cascade);
+        modelBuilder.Entity<AiPlanSuggestion>().HasOne(x => x.Feature).WithMany().HasForeignKey(x => x.FeatureId).OnDelete(DeleteBehavior.SetNull);
         modelBuilder.Entity<AiPlanSuggestion>().HasOne(x => x.CreatedBy).WithMany(x => x.AiPlanSuggestions).HasForeignKey(x => x.CreatedById).OnDelete(DeleteBehavior.SetNull);
         modelBuilder.Entity<ActivityLog>().HasOne(x => x.Project).WithMany(x => x.ActivityLogs).HasForeignKey(x => x.ProjectId).OnDelete(DeleteBehavior.Cascade);
         modelBuilder.Entity<ActivityLog>().HasOne(x => x.User).WithMany(x => x.ActivityLogs).HasForeignKey(x => x.UserId).OnDelete(DeleteBehavior.SetNull);
