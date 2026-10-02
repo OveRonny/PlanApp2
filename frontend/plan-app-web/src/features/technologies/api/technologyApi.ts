@@ -3,3 +3,4 @@ export type TechnologyCategory = 'Frontend' | 'Backend' | 'Database' | 'Infrastr
 export interface Technology { id: string; name: string; category: TechnologyCategory }
 export async function getTechnologies() { const response = await apiFetch('/api/technologies'); if (!response.ok) throw new Error(await readApiError(response)); return response.json() as Promise<Technology[]> }
 export async function saveProjectTechnologies(projectId: string, technologyIds: string[]) { const response = await apiFetch(`/api/projects/${projectId}/technologies`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ technologyIds }) }); if (!response.ok) throw new Error(await readApiError(response)) }
+export async function getProjectTechnologies(projectId: string) { const response = await apiFetch(`/api/projects/${projectId}/technologies`); if (!response.ok) throw new Error(await readApiError(response)); return response.json() as Promise<string[]> }

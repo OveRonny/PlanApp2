@@ -1,0 +1,2 @@
+namespace Server_api.Models;
+public class AiTaskSuggestion { public Guid Id { get; set; } = Guid.NewGuid(); public Guid AiPlanSuggestionId { get; set; } public required string Title { get; set; } public string? Description { get; set; } public string? Context { get; set; } public Guid? TechnologyId { get; set; } public TechnologyCategory Category { get; set; } public AiApprovalStatus ApprovalStatus { get; set; } = AiApprovalStatus.PendingApproval; public Technology? Technology { get; set; } public AiPlanSuggestion AiPlanSuggestion { get; set; } = null!; }

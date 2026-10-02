@@ -16,7 +16,7 @@ public sealed class UpdateProjectTechnologiesEndpoint : IEndpoint
             db.ProjectTechnologies.RemoveRange(existing);
             db.ProjectTechnologies.AddRange(validIds.Select(id => new ProjectTechnology { ProjectId = projectId, TechnologyId = id }));
             await db.SaveChangesAsync(cancellationToken);
-            return Results.NoContent();
+            return Results.Ok(new { TechnologyIds = validIds });
         }).RequireAuthorization().WithTags("Projects");
     }
 }

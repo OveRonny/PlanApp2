@@ -1,0 +1,5 @@
+using Microsoft.EntityFrameworkCore;
+namespace Server_api.Features.Projects.Commands.UpdateProjectOverview;
+public sealed class UpdateProjectOverviewEndpoint : IEndpoint
+{ public void MapEndpoint(IEndpointRouteBuilder endpoints) { endpoints.MapPut("/api/projects/{projectId:guid}/overview", async (Guid projectId, UpdateProjectOverviewRequest request, AppDbContext db, ICurrentUser currentUser, CancellationToken cancellationToken) => { var project = await db.Projects.Include(x => x.Workspace).SingleOrDefaultAsync(x => x.Id == projectId, cancellationToken); if (project is null) return Results.NotFound(); if (project.Workspace.OwnerId != currentUser.UserId) return Results.Forbid(); project.AppGoal = request.AppGoal?.Trim(); project.TargetAudience = request.TargetAudience?.Trim(); project.ProductContext = request.ProductContext?.Trim(); await db.SaveChangesAsync(cancellationToken); return Results.NoContent(); }).RequireAuthorization().WithTags("Projects"); } }
+public sealed record UpdateProjectOverviewRequest(string? AppGoal, string? TargetAudience, string? ProductContext);

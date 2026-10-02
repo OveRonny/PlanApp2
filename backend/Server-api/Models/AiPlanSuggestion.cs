@@ -15,5 +15,6 @@ public class AiPlanSuggestion
     public DateTime? AppliedAt { get; set; }
     public Project Project { get; set; } = null!;
     public Feature? Feature { get; set; }
+    public ICollection<AiTaskSuggestion> Tasks { get; set; } = [];
     public User? CreatedBy { get; set; }
 }

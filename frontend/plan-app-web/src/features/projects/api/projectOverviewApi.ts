@@ -1,0 +1,3 @@
+import { apiFetch, readApiError } from '../../../shared/api/apiClient'
+export async function saveProjectOverview(projectId: string, overview: { appGoal: string; targetAudience: string; productContext: string }) { const response = await apiFetch(`/api/projects/${projectId}/overview`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(overview) }); if (!response.ok) throw new Error(await readApiError(response)) }
+export async function getProjectOverview(projectId: string) { const response = await apiFetch(`/api/projects/${projectId}/overview`); if (!response.ok) throw new Error(await readApiError(response)); return response.json() as Promise<{ appGoal?: string; targetAudience?: string; productContext?: string }> }
