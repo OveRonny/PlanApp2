@@ -10,4 +10,5 @@ global using Server_api.Infrastructure.Authentication;
 global using Server_api.Infrastructure.Validation;
 global using Server_api.Infrastructure.Endpoints;
 global using Server_api.Infrastructure.GitHub;
+global using Server_api.Infrastructure.OpenAI;
 global using Server_api.Models;
