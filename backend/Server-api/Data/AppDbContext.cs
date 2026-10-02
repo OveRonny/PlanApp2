@@ -23,7 +23,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options)
     public DbSet<GitHubConnection> GitHubConnections => Set<GitHubConnection>();
     public DbSet<GitHubUser> GitHubUsers => Set<GitHubUser>();
     public DbSet<WorkspaceMember> WorkspaceMembers => Set<WorkspaceMember>();
-    public DbSet<WorkspaceRepository> WorkspaceRepositories => Set<WorkspaceRepository>();
+    public DbSet<ProjectRepository> ProjectRepositories => Set<ProjectRepository>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -34,14 +34,14 @@ public class AppDbContext(DbContextOptions<AppDbContext> options)
         modelBuilder.Entity<GitHubConnection>().HasIndex(x => new { x.UserId, x.GitHubUserId }).IsUnique();
         modelBuilder.Entity<GitHubUser>().HasIndex(x => x.GitHubId).IsUnique();
         modelBuilder.Entity<WorkspaceMember>().HasKey(x => new { x.WorkspaceId, x.GitHubUserId });
-        modelBuilder.Entity<WorkspaceRepository>().HasIndex(x => new { x.WorkspaceId, x.GitHubRepositoryId }).IsUnique();
+        modelBuilder.Entity<ProjectRepository>().HasIndex(x => new { x.ProjectId, x.GitHubRepositoryId }).IsUnique();
 
         modelBuilder.Entity<GitHubConnection>().Property(x => x.GitHubUserId).HasMaxLength(100);
         modelBuilder.Entity<GitHubConnection>().Property(x => x.GitHubLogin).HasMaxLength(100);
         modelBuilder.Entity<GitHubUser>().Property(x => x.GitHubId).HasMaxLength(100);
         modelBuilder.Entity<GitHubUser>().Property(x => x.Login).HasMaxLength(100);
-        modelBuilder.Entity<WorkspaceRepository>().Property(x => x.GitHubRepositoryId).HasMaxLength(100);
-        modelBuilder.Entity<WorkspaceRepository>().Property(x => x.FullName).HasMaxLength(250);
+        modelBuilder.Entity<ProjectRepository>().Property(x => x.GitHubRepositoryId).HasMaxLength(100);
+        modelBuilder.Entity<ProjectRepository>().Property(x => x.FullName).HasMaxLength(250);
 
         modelBuilder.Entity<GitHubConnection>()
             .HasOne(x => x.User).WithMany(x => x.GitHubConnections)
@@ -55,9 +55,9 @@ public class AppDbContext(DbContextOptions<AppDbContext> options)
             .HasOne(x => x.GitHubUser).WithMany(x => x.WorkspaceMemberships)
             .HasForeignKey(x => x.GitHubUserId).OnDelete(DeleteBehavior.Cascade);
 
-        modelBuilder.Entity<WorkspaceRepository>()
-            .HasOne(x => x.Workspace).WithMany(x => x.Repositories)
-            .HasForeignKey(x => x.WorkspaceId).OnDelete(DeleteBehavior.Cascade);
+        modelBuilder.Entity<ProjectRepository>()
+            .HasOne(x => x.Project).WithOne(x => x.GitHubRepository)
+            .HasForeignKey<ProjectRepository>(x => x.ProjectId).OnDelete(DeleteBehavior.Cascade);
 
         modelBuilder.Entity<ProjectMember>()
             .HasKey(x => new { x.ProjectId, x.UserId });

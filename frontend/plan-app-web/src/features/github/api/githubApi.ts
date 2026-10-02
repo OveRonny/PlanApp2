@@ -18,8 +18,8 @@ export async function connectGitHub(code: string) {
 
 export interface GitHubRepository { id: number; fullName: string; defaultBranch?: string }
 export interface GitHubCollaborator { id: number; login: string; name?: string; avatarUrl?: string }
-export async function getRepositories() { const response = await apiFetch('/api/github/repositories'); if (!response.ok) throw new Error(await readApiError(response)); return response.json() as Promise<GitHubRepository[]> }
-export async function getCollaborators(repository: GitHubRepository) { const response = await apiFetch(`/api/github/repositories/${repository.id}/collaborators?fullName=${encodeURIComponent(repository.fullName)}`); if (!response.ok) throw new Error(await readApiError(response)); return response.json() as Promise<GitHubCollaborator[]> }
+export async function getRepositories() { const response = await apiFetch('/api/github/repositories', {}, false, false); if (!response.ok) throw new Error(await readApiError(response)); return response.json() as Promise<GitHubRepository[]> }
+export async function getCollaborators(repository: GitHubRepository) { const response = await apiFetch(`/api/github/repositories/${repository.id}/collaborators?fullName=${encodeURIComponent(repository.fullName)}`, {}, false, false); if (!response.ok) throw new Error(await readApiError(response)); return response.json() as Promise<GitHubCollaborator[]> }
 
 export function clearGitHubCallback() {
   const url = new URL(window.location.href)

@@ -13,21 +13,21 @@ const isAuthenticated = ref(Boolean(localStorage.getItem('planapp.accessToken'))
 const mode = ref<'login' | 'register'>('login')
 const notice = ref<string | null>(null)
 const selectedWorkspace = ref<{ id: string; name: string } | null>(null)
-const githubWorkspace = ref<{ id: string; name: string } | null>(null)
+const githubProject = ref<{ id: string; name: string } | null>(null)
 const githubConnected = ref(localStorage.getItem('planapp.githubConnected') === 'true')
 
 async function handleGitHubCallback() {
   const params = new URLSearchParams(window.location.search)
   const code = params.get('code')
-  const workspaceId = localStorage.getItem('planapp.githubWorkspaceId')
-  if (!code || !workspaceId || !isAuthenticated.value) return
+  const projectId = localStorage.getItem('planapp.githubWorkspaceId')
+  if (!code || !projectId || !isAuthenticated.value) return
   try {
     await connectGitHub(code)
     localStorage.setItem('planapp.githubConnected', 'true')
     githubConnected.value = true
     clearGitHubCallback()
     localStorage.removeItem('planapp.githubWorkspaceId')
-    githubWorkspace.value = { id: workspaceId, name: 'GitHub workspace' }
+    githubProject.value = { id: projectId, name: 'GitHub project' }
   } catch { clearGitHubCallback() }
 }
 
@@ -46,15 +46,28 @@ function handleSessionExpired() {
   notice.value = 'Innloggingen din har utløpt. Logg inn på nytt.'
 }
 
+function handleLoggedOut() {
+  isAuthenticated.value = false
+  selectedWorkspace.value = null
+  githubProject.value = null
+  githubConnected.value = false
+  localStorage.removeItem('planapp.githubConnected')
+  mode.value = 'login'
+}
+
 onMounted(() => window.addEventListener('planapp:session-expired', handleSessionExpired))
+onMounted(() => window.addEventListener('planapp:logged-out', handleLoggedOut))
 onMounted(handleGitHubCallback)
-onBeforeUnmount(() => window.removeEventListener('planapp:session-expired', handleSessionExpired))
+onBeforeUnmount(() => {
+  window.removeEventListener('planapp:session-expired', handleSessionExpired)
+  window.removeEventListener('planapp:logged-out', handleLoggedOut)
+})
 </script>
 
 <template>
-  <GitHubMembersPage v-if="isAuthenticated && githubWorkspace" :workspace-id="githubWorkspace.id" :workspace-name="githubWorkspace.name" :connected="githubConnected" @back="githubWorkspace = null" @connected="githubWorkspace = null" />
-  <ProjectsPage v-else-if="isAuthenticated && selectedWorkspace" :workspace-id="selectedWorkspace.id" :workspace-name="selectedWorkspace.name" @back="selectedWorkspace = null" />
-  <WorkspacePage v-else-if="isAuthenticated" @selected="selectedWorkspace = $event" @github="githubWorkspace = $event" @logout="logout" />
+  <GitHubMembersPage v-if="isAuthenticated && githubProject" :project-id="githubProject.id" :project-name="githubProject.name" :connected="githubConnected" @back="githubProject = null" @connected="githubProject = null" />
+  <ProjectsPage v-else-if="isAuthenticated && selectedWorkspace" :workspace-id="selectedWorkspace.id" :workspace-name="selectedWorkspace.name" @back="selectedWorkspace = null" @github="githubProject = $event" />
+  <WorkspacePage v-else-if="isAuthenticated" @selected="selectedWorkspace = $event" @logout="logout" />
   <AuthShell v-else>
     <template #form>
       <LoginForm v-if="mode === 'login'" @authenticated="handleAuthenticated" @register="switchMode('register')" />

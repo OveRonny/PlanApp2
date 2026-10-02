@@ -17,13 +17,13 @@ async function refreshSession(): Promise<boolean> {
   return true
 }
 
-export async function apiFetch(path: string, init: RequestInit = {}, retry = true): Promise<Response> {
+export async function apiFetch(path: string, init: RequestInit = {}, retry = true, expireSessionOnUnauthorized = true): Promise<Response> {
   const headers = new Headers(init.headers)
   const accessToken = localStorage.getItem('planapp.accessToken')
   if (accessToken) headers.set('Authorization', `Bearer ${accessToken}`)
   const response = await fetch(`${apiBaseUrl}${path}`, { ...init, headers })
   if (response.status === 401 && retry && await refreshSession()) return apiFetch(path, init, false)
-  if (response.status === 401) clearSession()
+  if (response.status === 401 && expireSessionOnUnauthorized) clearSession()
   return response
 }
 

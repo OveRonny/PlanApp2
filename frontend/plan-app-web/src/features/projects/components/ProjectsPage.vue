@@ -10,7 +10,7 @@ import {
 } from "../api/projectApi";
 
 const props = defineProps<{ workspaceId: string; workspaceName: string }>();
-const emit = defineEmits<{ back: [] }>();
+const emit = defineEmits<{ back: []; github: [project: Project] }>();
 const projects = ref<Project[]>([]);
 const name = ref("");
 const description = ref("");
@@ -143,6 +143,7 @@ onMounted(load);
           >
             Slett
           </button>
+          <button class="icon-button" type="button" @click.stop="emit('github', project)">GitHub</button>
         </div>
       </article>
     </div>
