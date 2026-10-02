@@ -2,7 +2,7 @@
 import { ref } from 'vue'
 import { getCollaborators, getRepositories, startGitHubOAuth, type GitHubCollaborator, type GitHubRepository } from '../api/githubApi'
 
-const props = defineProps<{ workspaceName: string; workspaceId?: string; connected?: boolean }>()
+const props = defineProps<{ projectName: string; projectId?: string; connected?: boolean }>()
 const emit = defineEmits<{ back: []; connected: [] }>()
 const connected = ref(props.connected ?? localStorage.getItem('planapp.githubConnected') === 'true')
 const repository = ref('')
@@ -14,7 +14,7 @@ async function loadRepositories() { try { repositories.value = await getReposito
 async function selectRepository() { const selected = repositories.value.find(item => item.fullName === repository.value); if (!selected) return; try { collaborators.value = await getCollaborators(selected) } catch (exception) { error.value = exception instanceof Error ? exception.message : 'Kunne ikke hente medlemmer.' } }
 
 function connectGitHub() {
-  if (props.workspaceId) startGitHubOAuth(props.workspaceId)
+  if (props.projectId) startGitHubOAuth(props.projectId)
   else connected.value = true
 }
 if (connected.value) loadRepositories()
@@ -24,7 +24,7 @@ function saveMembers() { emit('connected') }
 <template>
   <main class="github-page">
     <header class="github-header">
-      <div><button class="back-link" type="button" @click="emit('back')">← Tilbake til workspaces</button><p class="eyebrow">WORKSPACE-INTEGRASJON</p><h1>GitHub-medlemmer</h1><p class="muted">Administrer medlemmer og repository for {{ workspaceName }}.</p></div>
+      <div><button class="back-link" type="button" @click="emit('back')">← Tilbake til prosjekt</button><p class="eyebrow">PROSJEKTINTEGRASJON</p><h1>GitHub-repository</h1><p class="muted">Koble repository og administrer medlemmer for {{ projectName }}.</p></div>
     </header>
     <section class="github-grid">
       <article class="github-panel">
@@ -33,13 +33,13 @@ function saveMembers() { emit('connected') }
         <p v-if="connected" class="connected-status">✓ GitHub er koblet til</p>
       </article>
       <article class="github-panel">
-        <div><p class="eyebrow">REPOSITORY</p><h2>Velg repository</h2><p class="muted">Repositoryet blir kilden for workspace-medlemmer.</p></div>
+        <div><p class="eyebrow">REPOSITORY</p><h2>Velg repository</h2><p class="muted">Repositoryet blir koblet til dette prosjektet.</p></div>
         <select v-model="repository" :disabled="!connected" @change="selectRepository"><option value="">{{ repositories.length ? 'Velg repository' : 'Laster repositories…' }}</option><option v-for="item in repositories" :key="item.id" :value="item.fullName">{{ item.fullName }}</option></select><p v-if="error" class="error-text">{{ error }}</p>
       </article>
     </section>
     <section class="member-panel">
-      <div class="member-heading"><div><p class="eyebrow">TILGANG</p><h2>Workspace-medlemmer</h2></div><button class="primary-button member-save" type="button" :disabled="!connected || !repository" @click="saveMembers">Lagre medlemmer</button></div>
-      <p class="muted">Velg hvem som skal få tilgang til dette workspace.</p>
+      <div class="member-heading"><div><p class="eyebrow">TILGANG</p><h2>Repository-medlemmer</h2></div><button class="primary-button member-save" type="button" :disabled="!connected || !repository" @click="saveMembers">Lagre medlemmer</button></div>
+      <p class="muted">Velg hvilke GitHub-collaborators som skal knyttes til prosjektet.</p>
       <div v-if="connected && collaborators.length" class="member-list"><label v-for="member in collaborators" :key="member.login" class="member-row"><input type="checkbox" checked /><span class="avatar">{{ member.login[0].toUpperCase() }}</span><span class="member-name"><strong>{{ member.name || member.login }}</strong><small>@{{ member.login }}</small></span><span class="role">Member</span></label></div>
       <div v-else-if="connected && repository" class="empty-state"><h3>Ingen collaborators funnet</h3><p class="muted">Dette repositoryet har ingen tilgjengelige collaborators.</p></div>
       <div v-else class="empty-state"><h3>Koble til GitHub først</h3><p class="muted">Når kontoen er koblet til, kan du velge repository og medlemmer.</p></div>
